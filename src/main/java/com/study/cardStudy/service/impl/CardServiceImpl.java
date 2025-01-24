@@ -53,7 +53,7 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public void deleteCard(Long cardId) {
-        Card card = cardRepository.findById(cardId).orElseThrow(
+        cardRepository.findById(cardId).orElseThrow(
                 () -> new ResourceNotFoundException("Card is not exist with given id:" + cardId)
         );
         cardRepository.deleteById(cardId);

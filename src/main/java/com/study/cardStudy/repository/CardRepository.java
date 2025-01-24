@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CardRepository extends JpaRepository<Card, Long> {
     Card findCardByIdInDeckAndDeck(long IdinDeck, Deck deck);
-
     @Transactional
     @Modifying
     @Query(value = "INSERT into card (term,definition,id_in_deck,deck_id) " + "VALUES (:#{#card.term},:#{#card.definition},:#{#card.idInDeck},:#{#card.deck.deckId})", nativeQuery = true)

@@ -19,9 +19,21 @@ public class Deck {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "deck_id")
     private Long deckId;
-    @Column(name="title")
+    @Column(name = "title")
     private String title;
-    @OneToMany(mappedBy = "deck", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "deck", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Card> cardList;
-
+//
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || o.getClass() != this.getClass()) return false;
+//
+//        Deck deck = (Deck) o;
+//        return deckId == deck.deckId
+//                && (title == deck.title
+//                || (title != null && title.equals(deck.getTitle()))) && (cardList == deck.cardList
+//                || (cardList != null && cardList.equals(deck.getCardList())
+//        ));
+//    }
 }

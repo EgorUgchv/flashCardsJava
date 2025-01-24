@@ -7,7 +7,6 @@ import com.study.cardStudy.mapper.DeckMapper;
 import com.study.cardStudy.repository.CardRepository;
 import com.study.cardStudy.repository.DeckRepository;
 import com.study.cardStudy.service.DeckService;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,38 +22,14 @@ public class DeckServiceImpl implements DeckService {
 
 
     @Override
-    @Transactional
     public DeckDto createDeck(DeckDto deckDto) {
         Deck deck = deckMapper.mapToDeck(deckDto);
         deck.getCardList().forEach(card -> card.setDeck(deck));
 
-        Deck existingDeck = deckRepository.findDeckByTitle(deck.getTitle());
+        String deckTitle = deck.getTitle();
+        Deck existingDeck = deckRepository.findDeckByTitle(deckTitle);
         if (existingDeck != null) {
-            existingDeck.getCardList().sort(Comparator.comparing(Card::getIdInDeck));
-            long deckId = existingDeck.getDeckId();
-            deck.getCardList().forEach(card -> {
-                card.getDeck().setDeckId(deckId);
-                Card existingCard = cardRepository.findCardByIdInDeckAndDeck(card.getIdInDeck(), existingDeck);
-                if (existingCard != null) {
-                    cardRepository.updateCard(card);
-                } else {
-                    cardRepository.insertCard(card);
-                }
-            });
-
-            int sizeNewDeck = deck.getCardList().size();
-            int sizeOldDeck = existingDeck.getCardList().size();
-            boolean isNewDeckSmallerThanExisting = sizeNewDeck < sizeOldDeck;
-
-            if (isNewDeckSmallerThanExisting) {
-                Iterator<Card> cardListIterator = existingDeck.getCardList().listIterator(sizeOldDeck - sizeNewDeck);
-                while (cardListIterator.hasNext()) {
-                    Card currentCard = cardListIterator.next();
-                    cardRepository.deleteCard(currentCard);
-                }
-                Card currentCard = cardListIterator.next();
-                cardRepository.deleteCard(currentCard);
-            }
+            updateExistingDeck(existingDeck, deck);
         } else {
             deckRepository.save(deck);
         }
@@ -65,17 +40,41 @@ public class DeckServiceImpl implements DeckService {
         return savedDeckDto;
     }
 
-    @Override
-    public DeckDto getDeckById(Long deckId) {
-/*
-        Deck deck = deckRepository.findById(deckId).orElseThrow(() -> new ResourceNotFoundException("Deck is not exist with given id: " + deckId));
-*/
-        Deck deck = deckRepository.findDeckByTitle("sdtrr");
-        if (deckRepository.findDeckByTitle("sdf") != null) {
+    private void updateExistingDeck(Deck existingDeck, Deck deck) {
+        existingDeck.getCardList().sort(Comparator.comparing(Card::getIdInDeck));
+        long deckId = existingDeck.getDeckId();
+        deck.getCardList().forEach(card -> {
+            card.getDeck().setDeckId(deckId);
+            Card existingCard = cardRepository.findCardByIdInDeckAndDeck(card.getIdInDeck(), existingDeck);
+            if (existingCard != null) {
+                cardRepository.updateCard(card);
+            } else {
+                cardRepository.insertCard(card);
+            }
+        });
 
-            System.out.println("asdasf");
-            System.out.println();
+        deleteExtraCards(existingDeck, deck);
+    }
+
+    private void deleteExtraCards(Deck existingDeck, Deck newDeck) {
+        int sizeNewDeck = newDeck.getCardList().size();
+        int sizeOldDeck = existingDeck.getCardList().size();
+        boolean isNewDeckSmallerThanExisting = sizeNewDeck < sizeOldDeck;
+
+        if (isNewDeckSmallerThanExisting) {
+            Iterator<Card> cardListIterator = existingDeck.getCardList().listIterator(sizeOldDeck - sizeNewDeck);
+            while (cardListIterator.hasNext()) {
+                Card currentCard = cardListIterator.next();
+                cardRepository.deleteCard(currentCard);
+            }
+            Card currentCard = cardListIterator.next();
+            cardRepository.deleteCard(currentCard);
         }
+    }
+
+    @Override
+    public DeckDto getDeckById(String title) {
+        Deck deck = deckRepository.findDeckByTitle(title);
         return deckMapper.mapToDeckDto(deck);
     }
 
