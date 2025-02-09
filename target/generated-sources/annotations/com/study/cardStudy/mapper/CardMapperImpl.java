@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-01-21T21:43:27+0700",
+    date = "2025-02-10T01:06:09+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 23.0.1 (Oracle Corporation)"
 )
 @Component
@@ -23,10 +23,13 @@ public class CardMapperImpl implements CardMapper {
         CardDto cardDto = new CardDto();
 
         cardDto.setDeckId( cardDeckDeckId( card ) );
+        cardDto.setRepetitions( toRepetitionsRecord( card.getRepetitions() ) );
+        cardDto.setInterval( toIntervalRecord( card.getInterval() ) );
         cardDto.setCardId( card.getCardId() );
         cardDto.setIdInDeck( card.getIdInDeck() );
         cardDto.setTerm( card.getTerm() );
         cardDto.setDefinition( card.getDefinition() );
+        cardDto.setNextReview( card.getNextReview() );
 
         return cardDto;
     }
@@ -40,10 +43,13 @@ public class CardMapperImpl implements CardMapper {
         Card card = new Card();
 
         card.setDeck( cardDtoToDeck( cardDto ) );
+        card.setRepetitions( fromRepetitionsRecord( cardDto.getRepetitions() ) );
+        card.setInterval( fromIntervalRecord( cardDto.getInterval() ) );
         card.setCardId( cardDto.getCardId() );
         card.setIdInDeck( cardDto.getIdInDeck() );
         card.setTerm( cardDto.getTerm() );
         card.setDefinition( cardDto.getDefinition() );
+        card.setNextReview( cardDto.getNextReview() );
 
         return card;
     }

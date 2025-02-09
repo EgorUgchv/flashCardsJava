@@ -1,8 +1,11 @@
 package com.study.cardStudy.service.impl;
 
+import com.study.cardStudy.common.QualityRecord;
+import com.study.cardStudy.dto.CardDto;
 import com.study.cardStudy.dto.DeckDto;
 import com.study.cardStudy.entity.Card;
 import com.study.cardStudy.entity.Deck;
+import com.study.cardStudy.mapper.CardMapper;
 import com.study.cardStudy.mapper.DeckMapper;
 import com.study.cardStudy.repository.CardRepository;
 import com.study.cardStudy.repository.DeckRepository;
@@ -16,6 +19,7 @@ import java.util.Iterator;
 @Service
 @AllArgsConstructor
 public class DeckServiceImpl implements DeckService {
+    private final CardMapper cardMapper;
     public DeckRepository deckRepository;
     public CardRepository cardRepository;
     public final DeckMapper deckMapper;
@@ -23,8 +27,11 @@ public class DeckServiceImpl implements DeckService {
 
     @Override
     public DeckDto createDeck(DeckDto deckDto) {
+
         Deck deck = deckMapper.mapToDeck(deckDto);
-        deck.getCardList().forEach(card -> card.setDeck(deck));
+        deck.getCardList().forEach(card -> {
+            card.setDeck(deck);
+        });
 
         String deckTitle = deck.getTitle();
         Deck existingDeck = deckRepository.findDeckByTitle(deckTitle);
@@ -78,5 +85,10 @@ public class DeckServiceImpl implements DeckService {
         return deckMapper.mapToDeckDto(deck);
     }
 
+    @Override
+    public CardDto updateQuality(QualityRecord cardQuality,long deckId, long idInDeck) {
+        Card cardToUpdateQuality = cardRepository.findByIdInDeckAndDeck_DeckId(idInDeck,deckId);
+        return cardMapper.mapToCardDto( cardToUpdateQuality);
 
+    }
 }

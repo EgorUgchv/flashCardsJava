@@ -1,13 +1,13 @@
 package com.study.cardStudy.controller;
 
+import com.study.cardStudy.common.QualityRecord;
+import com.study.cardStudy.dto.CardDto;
 import com.study.cardStudy.dto.DeckDto;
 import com.study.cardStudy.service.DeckService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import static org.springframework.web.servlet.function.ServerResponse.badRequest;
 
 @CrossOrigin("*")
 @AllArgsConstructor
@@ -30,5 +30,15 @@ public class DeckController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(deckDto,HttpStatus.ACCEPTED);
+    }
+
+    @PatchMapping("/{deckId}/cards/{idInDeck}")
+    public ResponseEntity<CardDto> updateCardQuality(
+            @RequestBody QualityRecord qualityRecord,
+            @PathVariable("deckId") long deckId,
+            @PathVariable("idInDeck") long idInDeck
+            ){
+       CardDto savedCard = deckService.updateQuality(qualityRecord,deckId,idInDeck);
+       return new ResponseEntity<>(savedCard, HttpStatus.ACCEPTED);
     }
 }

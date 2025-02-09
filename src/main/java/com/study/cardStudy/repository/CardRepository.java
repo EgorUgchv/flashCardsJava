@@ -26,4 +26,5 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Modifying
     @Query(value = "DELETE  FROM Card WHERE (deck_id = :#{#card.deck.deckId} AND id_in_deck =:#{#card.idInDeck})", nativeQuery = true)
     void deleteCard(@Param("card") Card card);
+    Card findByIdInDeckAndDeck_DeckId(long idInDeck, long deckId);
 }

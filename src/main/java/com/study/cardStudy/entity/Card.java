@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 
 @Getter
 @Setter
@@ -24,6 +26,14 @@ public class Card {
     private String term;
     @Column(name = "definition")
     private String definition;
+    @Column(name = "repetitions")
+    private int repetitions = 0;
+    @Column(name = "interval")
+    private int interval = 1;
+    @Column(name = "easiness")
+    private double easiness = 2.5;
+    @Column(name = "next_review")
+    private LocalDateTime nextReview;
     @ManyToOne
     @JoinColumn(name = "deck_id")
     private Deck deck;
