@@ -1,10 +1,15 @@
 package com.study.cardStudy.service.impl;
 
 import com.study.cardStudy.common.QualityRecord;
+import com.study.cardStudy.service.SpacedRepetitionService;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-public class SpacedRepetitionServiceImpl {
+@Service
+public class SpacedRepetitionServiceImpl implements SpacedRepetitionService {
     private int repetitions;
     private int interval;
     private double easiness;
@@ -18,12 +23,11 @@ public class SpacedRepetitionServiceImpl {
 
     }
 
-    public void update(QualityRecord qualityRecord) {
-        LocalDateTime today = LocalDateTime.now();
+    public LocalDateTime update(QualityRecord qualityRecord, LocalDateTime cardAccessedAt) {
 
         if (qualityRecord.quality() == 0) {
             repetitions = 0;
-            interval = 1;
+            interval = 0;
         } else {
             easiness += 0.1 - (3 - qualityRecord.quality()) * (0.08 + (3 - qualityRecord.quality()) * 0.02);
             easiness = Math.max(1.3, easiness);
@@ -38,6 +42,6 @@ public class SpacedRepetitionServiceImpl {
                 interval = (int) Math.round(interval * easiness);
             }
         }
-        nextReview = today.plusDays(interval);
+        return cardAccessedAt.plusDays(interval);
     }
 }

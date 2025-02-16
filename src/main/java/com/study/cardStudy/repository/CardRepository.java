@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+
 @Repository
 public interface CardRepository extends JpaRepository<Card, Long> {
     Card findCardByIdInDeckAndDeck(long IdinDeck, Deck deck);
@@ -20,7 +22,12 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Transactional
     @Modifying
     @Query(value = "UPDATE Card SET term = :#{#card.term}, definition = :#{#card.definition} WHERE (deck_id = :#{#card.deck.deckId} AND id_in_deck =:#{#card.idInDeck})", nativeQuery = true)
-    void updateCard(@Param("card") Card card);
+    int updateCard(@Param("card") Card card);
+
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE Card SET next_review = :#{#cardAccessedAt} WHERE deck_id = :#{#deckId} AND id_in_deck = :#{#idInDeck}" , nativeQuery = true)
+    int updateNextReview(@Param("deckId") Long deckId, @Param("idInDeck")Long idInDeck,@Param("cardAccessedAt") LocalDateTime cardAccessedAt);
 
     @Transactional
     @Modifying

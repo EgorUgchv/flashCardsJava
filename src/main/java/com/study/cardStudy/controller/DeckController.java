@@ -9,6 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+
 @CrossOrigin("*")
 @AllArgsConstructor
 @RestController
@@ -34,11 +38,16 @@ public class DeckController {
 
     @PatchMapping("/{deckId}/cards/{idInDeck}")
     public ResponseEntity<CardDto> updateCardQuality(
-            @RequestBody QualityRecord qualityRecord,
+            @RequestBody Map<String,Object> body,
             @PathVariable("deckId") long deckId,
             @PathVariable("idInDeck") long idInDeck
             ){
-       CardDto savedCard = deckService.updateQuality(qualityRecord,deckId,idInDeck);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime time = LocalDateTime.parse((String) body.get("time"), formatter);
+        QualityRecord qualityRecord = new QualityRecord((Integer) body.get("quality"));
+        System.out.println("TIME" + time);
+        System.out.println("Quality" + qualityRecord);
+       CardDto savedCard = deckService.updateQuality(deckId, idInDeck, qualityRecord, time);
        return new ResponseEntity<>(savedCard, HttpStatus.ACCEPTED);
     }
 }

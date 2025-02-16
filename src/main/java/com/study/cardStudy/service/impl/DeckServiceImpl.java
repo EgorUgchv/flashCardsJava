@@ -13,6 +13,7 @@ import com.study.cardStudy.service.DeckService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.Iterator;
 
@@ -20,9 +21,10 @@ import java.util.Iterator;
 @AllArgsConstructor
 public class DeckServiceImpl implements DeckService {
     private final CardMapper cardMapper;
-    public DeckRepository deckRepository;
-    public CardRepository cardRepository;
-    public final DeckMapper deckMapper;
+    private DeckRepository deckRepository;
+    private CardRepository cardRepository;
+    private SpacedRepetitionServiceImpl repetitionService;
+    private final DeckMapper deckMapper;
 
 
     @Override
@@ -86,9 +88,11 @@ public class DeckServiceImpl implements DeckService {
     }
 
     @Override
-    public CardDto updateQuality(QualityRecord cardQuality,long deckId, long idInDeck) {
-        Card cardToUpdateQuality = cardRepository.findByIdInDeckAndDeck_DeckId(idInDeck,deckId);
-        return cardMapper.mapToCardDto( cardToUpdateQuality);
+    public CardDto updateQuality(long deckId, long idInDeck, QualityRecord cardQuality, LocalDateTime cardAccessedAt) {
+        Card cardToUpdateQuality = cardRepository.findByIdInDeckAndDeck_DeckId(idInDeck, deckId);
+        LocalDateTime nextReview = repetitionService.update(cardQuality, cardAccessedAt);
+        cardRepository.updateNextReview(deckId,idInDeck,nextReview);
+        return cardMapper.mapToCardDto(cardToUpdateQuality);
 
     }
 }
