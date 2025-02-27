@@ -47,7 +47,7 @@ public class DeckController {
         QualityRecord qualityRecord = new QualityRecord((Integer) body.get("quality"));
         System.out.println("TIME" + time);
         System.out.println("Quality" + qualityRecord);
-       CardDto savedCard = deckService.updateQuality(deckId, idInDeck, qualityRecord, time);
+       CardDto savedCard = deckService.updateNextReviewCard(deckId, idInDeck, qualityRecord, time);
        return new ResponseEntity<>(savedCard, HttpStatus.ACCEPTED);
     }
 }

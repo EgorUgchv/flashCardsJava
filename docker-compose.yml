@@ -1,0 +1,26 @@
+volumes:
+  pg_cardstudy:
+
+services:
+  cardstudy_db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=cardstudy_db
+    volumes:
+      - pg_cardstudy:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5433:5432"
+
+  app:
+    restart: always
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - cardstudy_db
+    environment:
+      SPRING_DATASOURCE_URL: 'jdbc:postgresql://cardstudy_db:5432/cardstudy_db'
+      JAVA_OPTS: '-Xmx512m'

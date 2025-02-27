@@ -31,9 +31,7 @@ public class DeckServiceImpl implements DeckService {
     public DeckDto createDeck(DeckDto deckDto) {
 
         Deck deck = deckMapper.mapToDeck(deckDto);
-        deck.getCardList().forEach(card -> {
-            card.setDeck(deck);
-        });
+        deck.getCardList().forEach(card -> card.setDeck(deck));
 
         String deckTitle = deck.getTitle();
         Deck existingDeck = deckRepository.findDeckByTitle(deckTitle);
@@ -88,7 +86,7 @@ public class DeckServiceImpl implements DeckService {
     }
 
     @Override
-    public CardDto updateQuality(long deckId, long idInDeck, QualityRecord cardQuality, LocalDateTime cardAccessedAt) {
+    public CardDto updateNextReviewCard(long deckId, long idInDeck, QualityRecord cardQuality, LocalDateTime cardAccessedAt) {
         Card cardToUpdateQuality = cardRepository.findByIdInDeckAndDeck_DeckId(idInDeck, deckId);
         LocalDateTime nextReview = repetitionService.update(cardQuality, cardAccessedAt);
         cardRepository.updateNextReview(deckId,idInDeck,nextReview);

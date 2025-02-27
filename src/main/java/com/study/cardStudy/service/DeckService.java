@@ -10,5 +10,5 @@ public interface DeckService {
     DeckDto createDeck(DeckDto deckDto);
 
     DeckDto getDeckById(String title);
-    CardDto updateQuality(long deckId, long idInDeck, QualityRecord cardQuality, LocalDateTime time);
+    CardDto updateNextReviewCard(long deckId, long idInDeck, QualityRecord cardQuality, LocalDateTime time);
 }

@@ -28,7 +28,7 @@ public class Card {
     private String definition;
     @Column(name = "repetitions")
     private int repetitions = 0;
-    @Column(name = "interval")
+    @Column(name = "review_interval")
     private int interval = 1;
     @Column(name = "easiness")
     private double easiness = 2.5;
