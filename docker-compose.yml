@@ -1,7 +1,25 @@
 volumes:
   pg_cardstudy:
-
+  web-root:
 services:
+  nginx:
+    depends_on:
+      - frontend
+      - backend
+    build:
+      context: /home/pluer/Programming/cardstudy-frontend/nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -O /dev/null http://localhost || exit 1"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+    networks:
+      - app-network
   cardstudy_db:
     image: postgres
     restart: always
@@ -11,16 +29,50 @@ services:
       - POSTGRES_DB=cardstudy_db
     volumes:
       - pg_cardstudy:/var/lib/postgresql/data
+    healthcheck:
+       test: [ "CMD-SHELL", "pg_isready -U user -d cardstudy_db" ]
+       interval: 1s
+       timeout: 5s
+       retries: 10
     ports:
-      - "127.0.0.1:5433:5432"
-
-  app:
-    restart: always
+      - "5433:5432"
+    networks:
+      - app-network
+  backend:
+    container_name: backend
     build: .
+    networks:
+      - app-network
     ports:
       - "8080:8080"
-    depends_on:
-      - cardstudy_db
+    restart: always
     environment:
       SPRING_DATASOURCE_URL: 'jdbc:postgresql://cardstudy_db:5432/cardstudy_db'
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: pass
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       JAVA_OPTS: '-Xmx512m'
+    depends_on:
+      cardstudy_db:
+        condition: service_healthy
+  frontend:
+    image: frontend
+    networks:
+      - app-network
+    build:
+      context: /home/pluer/Programming/cardstudy-frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - '5173:5173'
+    stdin_open: true
+    depends_on:
+      - backend
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5173" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+networks:
+  app-network:
+    driver: bridge

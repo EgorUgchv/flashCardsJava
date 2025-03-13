@@ -5,6 +5,7 @@ COPY ./src ./src
 RUN mvn clean install -DskipTests
 
 FROM eclipse-temurin:17-jre-jammy
+RUN apt-get update && apt-get install -y iputils-ping dnsutils
 WORKDIR /opt/app
 EXPOSE 8080
 COPY --from=builder /opt/app/target/*.jar /opt/app/*.jar
