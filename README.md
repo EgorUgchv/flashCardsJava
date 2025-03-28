@@ -23,7 +23,7 @@ This command runs the `docker-compose.yml` file locate in the root directory of 
 docker compose up -d
 ```
 
-Though, you can go to `http:localhost:80/add-cards` and input data.
+Then you can go to `http:localhost:80/add-cards` and input data.
 
 ![add-cards Page](/img/add-cardsPage.png)
 
