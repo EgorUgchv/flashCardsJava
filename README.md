@@ -6,7 +6,7 @@ Technologies used in project:
 
 * Backend: java spring boot, docker, docker compose
 
-* Frontend: React, Bootstrap
+* Frontend: React, Bootstrap. You can see the [Frontend project](https://github.com/EgorUgchv/flashCardsFrontend).
 
 You can run application with following commands:
 
