@@ -15,12 +15,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.core.AutoConfigureCache;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
@@ -34,10 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @AutoConfigureDataJpa
 @AutoConfigureTestDatabase
-@AutoConfigureCache
 @AutoConfigureTestEntityManager
-@Import(DeckServiceImpl.class)
 @ActiveProfiles("tests")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class DeckServiceImplTests {
     @Autowired
     private DeckServiceImpl deckService;
@@ -96,20 +94,19 @@ class DeckServiceImplTests {
         deckService.createDeck(deckDto);
 
         List<CardDto> newCardDtoList = List.of(new CardDto(1L, 1L, "put", "класть", 1L, repetitions, interval, easiness, cardAccessedAt));
-        DeckDto newDeckDto = new DeckDto(1L, "english", cardDtoList);
+        DeckDto newDeckDto = new DeckDto(1L, "english", newCardDtoList);
         deckService.createDeck(newDeckDto);
 
         Deck savedDeck = deckRepository.findById(newDeckDto.getDeckId()).orElseThrow(() -> new RuntimeException("Deck not found"));
-        cardDtoList.forEach(card -> {
+        newCardDtoList.forEach(card -> {
             CardDto cardFromDB = cardMapper.mapToCardDto(cardRepository.findCardByIdInDeckAndDeck(card.idInDeck, savedDeck));
-            assertAll("Grouped Assertions of  Deck from DB", () -> assertEquals(card.getCardId(), cardFromDB.getCardId()), () -> assertEquals(card.getIdInDeck(), cardFromDB.getIdInDeck()), () -> assertEquals(card.getTerm(), cardFromDB.getTerm()), () -> assertEquals(card.getDefinition(), cardFromDB.getDefinition()), () -> assertEquals(card.getDeckId(), cardFromDB.getDeckId())
-            );
+            assertAll("Grouped Assertions of  Deck from DB", () -> assertEquals(card.getCardId(), cardFromDB.getCardId()), () -> assertEquals(card.getIdInDeck(), cardFromDB.getIdInDeck()), () -> assertEquals(card.getTerm(), cardFromDB.getTerm()), () -> assertEquals(card.getDefinition(), cardFromDB.getDefinition()), () -> assertEquals(card.getDeckId(), cardFromDB.getDeckId()));
         });
     }
 
     @Test
     @DisplayName("Card update in the next review")
-    void shouldUpdateCardNextReview() throws Exception{
+    void shouldUpdateCardNextReview() throws Exception {
         RepetitionsRecord repetitions = new RepetitionsRecord(0);
         IntervalRecord interval = new IntervalRecord(1);
         EasinessRecord easiness = new EasinessRecord(2.5);
@@ -125,7 +122,7 @@ class DeckServiceImplTests {
         QualityRecord cardQuality = new QualityRecord(hardQuality);
 
 
-        deckService.updateNextReviewCard(1L,1L,cardQuality,cardAccessedAt);
+        deckService.updateNextReviewCard(1L, 1L, cardQuality, cardAccessedAt);
         LocalDateTime expectedNextReview = cardAccessedAt.plusDays(1);
         Deck savedDeck = deckRepository.findById(oldDeckDto.getDeckId()).orElseThrow(() -> new RuntimeException("Deck not found"));
         oldCardDtoList.forEach(card -> {
@@ -133,8 +130,7 @@ class DeckServiceImplTests {
             System.out.println("REVIEW:" + cardFromDB.getNextReview());
             System.out.println("REVIEW EQUAL:" + cardAccessedAt);
 
-            assertAll("Grouped Assertions of  Deck from DB", () -> assertEquals(card.getCardId(), cardFromDB.getCardId()), () -> assertEquals(card.getIdInDeck(), cardFromDB.getIdInDeck()), () -> assertEquals(card.getTerm(), cardFromDB.getTerm()), () -> assertEquals(card.getDefinition(), cardFromDB.getDefinition()), () -> assertEquals(card.getDeckId(), cardFromDB.getDeckId()),()-> assertEquals(expectedNextReview,cardFromDB.getNextReview())
-            );
+            assertAll("Grouped Assertions of  Deck from DB", () -> assertEquals(card.getCardId(), cardFromDB.getCardId()), () -> assertEquals(card.getIdInDeck(), cardFromDB.getIdInDeck()), () -> assertEquals(card.getTerm(), cardFromDB.getTerm()), () -> assertEquals(card.getDefinition(), cardFromDB.getDefinition()), () -> assertEquals(card.getDeckId(), cardFromDB.getDeckId()), () -> assertEquals(expectedNextReview, cardFromDB.getNextReview()));
         });
     }
 }

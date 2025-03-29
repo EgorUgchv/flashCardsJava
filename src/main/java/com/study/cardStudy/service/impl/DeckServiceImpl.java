@@ -69,12 +69,13 @@ public class DeckServiceImpl implements DeckService {
         boolean isNewDeckSmallerThanExisting = sizeNewDeck < sizeOldDeck;
 
         if (isNewDeckSmallerThanExisting) {
-            Iterator<Card> cardListIterator = existingDeck.getCardList().listIterator(sizeOldDeck - sizeNewDeck);
+            Iterator<Card> cardListIterator = existingDeck.getCardList().listIterator(sizeOldDeck - sizeNewDeck-1);
+            Card currentCard = null;
             while (cardListIterator.hasNext()) {
-                Card currentCard = cardListIterator.next();
+                currentCard = cardListIterator.next();
                 cardRepository.deleteCard(currentCard);
             }
-            Card currentCard = cardListIterator.next();
+
             cardRepository.deleteCard(currentCard);
         }
     }
